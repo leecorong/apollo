@@ -1,7 +1,6 @@
-package com.ctrip.framework.apollo.portal.spi.custom;
+package com.ctrip.framework.apollo.portal.spi.letv;
 
 import com.ctrip.framework.apollo.portal.entity.bo.UserInfo;
-import org.springframework.stereotype.Component;
 
 /**
  * 线程本地变量，保存用户相关信息

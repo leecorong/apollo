@@ -90,14 +90,14 @@ public class NamespaceService {
       return namespace;
     }
 
-    //custom cluster's namespace not exist.
+    //letv cluster's namespace not exist.
     //return default cluster's namespace
     if (namespace == null) {
       return findOne(appId, ConfigConsts.CLUSTER_NAME_DEFAULT, namespaceName);
     }
 
-    //custom cluster's namespace exist and has published.
-    //return custom cluster's namespace
+    //letv cluster's namespace exist and has published.
+    //return letv cluster's namespace
     Release latestActiveRelease = releaseService.findLatestActiveRelease(namespace);
     if (latestActiveRelease != null) {
       return namespace;
@@ -105,14 +105,14 @@ public class NamespaceService {
 
     Namespace defaultNamespace = findOne(appId, ConfigConsts.CLUSTER_NAME_DEFAULT, namespaceName);
 
-    //custom cluster's namespace exist but never published.
+    //letv cluster's namespace exist but never published.
     //and default cluster's namespace not exist.
-    //return custom cluster's namespace
+    //return letv cluster's namespace
     if (defaultNamespace == null) {
       return namespace;
     }
 
-    //custom cluster's namespace exist but never published.
+    //letv cluster's namespace exist but never published.
     //and default cluster's namespace exist and has published.
     //return default cluster's namespace
     Release defaultNamespaceLatestActiveRelease = releaseService.findLatestActiveRelease(defaultNamespace);
@@ -120,9 +120,9 @@ public class NamespaceService {
       return defaultNamespace;
     }
 
-    //custom cluster's namespace exist but never published.
+    //letv cluster's namespace exist but never published.
     //and default cluster's namespace exist but never published.
-    //return custom cluster's namespace
+    //return letv cluster's namespace
     return namespace;
   }
 

@@ -1,4 +1,4 @@
-package com.ctrip.framework.apollo.portal.spi.custom.sso;
+package com.ctrip.framework.apollo.portal.spi.letv.sso;
 
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;

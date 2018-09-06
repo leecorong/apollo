@@ -1,10 +1,9 @@
 package com.ctrip.framework.apollo.portal.controller;
 
-import com.ctrip.framework.apollo.portal.entity.bo.UserInfo;
 import com.ctrip.framework.apollo.portal.entity.po.UserPO;
 import com.ctrip.framework.apollo.portal.repository.UserRepository;
-import com.ctrip.framework.apollo.portal.spi.custom.sso.LoginUtil;
-import com.ctrip.framework.apollo.portal.spi.custom.sso.Md5Encrypt;
+import com.ctrip.framework.apollo.portal.spi.letv.sso.LoginUtil;
+import com.ctrip.framework.apollo.portal.spi.letv.sso.Md5Encrypt;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -78,7 +77,7 @@ public class SignInController {
         String hideInfo = "zbdhrirkdmgngitmagic" + username;
         Cookie cookie = new Cookie("tk", hideInfo);
         cookie.setPath("/");
-        cookie.setMaxAge(60);
+        cookie.setMaxAge(60*10);
         response.addCookie(cookie);
     }
 

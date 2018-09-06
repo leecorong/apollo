@@ -1,4 +1,4 @@
-package com.ctrip.framework.apollo.portal.spi.custom.sso;
+package com.ctrip.framework.apollo.portal.spi.letv.sso;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
