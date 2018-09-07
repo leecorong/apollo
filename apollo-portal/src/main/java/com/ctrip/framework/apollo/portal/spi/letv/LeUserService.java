@@ -1,10 +1,10 @@
 package com.ctrip.framework.apollo.portal.spi.letv;
 
+import com.ctrip.framework.apollo.core.utils.StringUtils;
 import com.ctrip.framework.apollo.portal.entity.bo.UserInfo;
 import com.ctrip.framework.apollo.portal.entity.po.UserPO;
 import com.ctrip.framework.apollo.portal.repository.UserRepository;
 import com.ctrip.framework.apollo.portal.spi.UserService;
-import com.google.common.collect.Lists;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.LinkedList;
@@ -23,7 +23,12 @@ public class LeUserService implements UserService {
     @Override
     public List<UserInfo> searchUsers(String keyword, int offset, int limit) {
         List<UserInfo> userInfos = new LinkedList<>();
-        List<UserPO> userPOS = userRepository.findByUsernameLikeAndEnabled(keyword, 1);
+        List<UserPO> userPOS;
+        if (StringUtils.isEmpty(keyword)) {
+            userPOS = userRepository.findFirst20ByEnabled(1);
+        } else {
+            userPOS = userRepository.findByUsernameLikeAndEnabled(keyword, 1);
+        }
         for (UserPO userPO : userPOS) {
             userInfos.add(userPO.toUserInfo());
         }
@@ -32,33 +37,16 @@ public class LeUserService implements UserService {
 
     @Override
     public UserInfo findByUserId(String userId) {
-        if (userId.equals("apollo")) {
-            return assembleDefaultUser();
-        } else {
-            return userRepository.findByUsername(userId).toUserInfo();
-        }
+        return userRepository.findByUsername(userId).toUserInfo();
     }
 
     @Override
     public List<UserInfo> findByUserIds(List<String> userIds) {
-        if (userIds.contains("apollo")) {
-            return Lists.newArrayList(assembleDefaultUser());
-        } else {
-            List<UserInfo> userInfos = new LinkedList<>();
-            List<UserPO> userPOS = userRepository.findByUsernameIn(userIds);
-            for (UserPO userPO : userPOS) {
-                userInfos.add(userPO.toUserInfo());
-            }
-            return userInfos;
+        List<UserInfo> userInfos = new LinkedList<>();
+        List<UserPO> userPOS = userRepository.findByUsernameIn(userIds);
+        for (UserPO userPO : userPOS) {
+            userInfos.add(userPO.toUserInfo());
         }
-    }
-
-    private UserInfo assembleDefaultUser() {
-        UserInfo defaultUser = new UserInfo();
-        defaultUser.setUserId("apollo");
-        defaultUser.setName("apollo");
-        defaultUser.setEmail("apollo@acme.com");
-
-        return defaultUser;
+        return userInfos;
     }
 }
