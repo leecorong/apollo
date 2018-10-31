@@ -11,9 +11,11 @@ import com.google.common.collect.Multimap;
 import com.ctrip.framework.apollo.Config;
 import com.ctrip.framework.apollo.ConfigService;
 
+import com.google.common.collect.Sets;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.Set;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.EnvironmentAware;
@@ -40,7 +42,7 @@ import org.springframework.core.env.PropertySource;
  */
 public class PropertySourcesProcessor implements BeanFactoryPostProcessor, EnvironmentAware, PriorityOrdered {
   private static final Multimap<Integer, String> NAMESPACE_NAMES = LinkedHashMultimap.create();
-  private static final AtomicBoolean INITIALIZED = new AtomicBoolean(false);
+  private static final Set<BeanFactory> AUTO_UPDATE_INITIALIZED_BEAN_FACTORIES = Sets.newConcurrentHashSet();
 
   private final ConfigPropertySourceFactory configPropertySourceFactory = SpringInjector
       .getInstance(ConfigPropertySourceFactory.class);
@@ -53,11 +55,8 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
 
   @Override
   public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory) throws BeansException {
-    if (INITIALIZED.compareAndSet(false, true)) {
-      initializePropertySources();
-
-      initializeAutoUpdatePropertiesFeature(beanFactory);
-    }
+    initializePropertySources();
+    initializeAutoUpdatePropertiesFeature(beanFactory);
   }
 
   private void initializePropertySources() {
@@ -79,6 +78,9 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
         composite.addPropertySource(configPropertySourceFactory.getConfigPropertySource(namespace, config));
       }
     }
+
+    // clean up
+    NAMESPACE_NAMES.clear();
 
     // add after the bootstrap property source or to the first
     if (environment.getPropertySources()
@@ -110,7 +112,8 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
   }
 
   private void initializeAutoUpdatePropertiesFeature(ConfigurableListableBeanFactory beanFactory) {
-    if (!configUtil.isAutoUpdateInjectedSpringPropertiesEnabled()) {
+    if (!configUtil.isAutoUpdateInjectedSpringPropertiesEnabled() ||
+        !AUTO_UPDATE_INITIALIZED_BEAN_FACTORIES.add(beanFactory)) {
       return;
     }
 
@@ -127,12 +130,6 @@ public class PropertySourcesProcessor implements BeanFactoryPostProcessor, Envir
   public void setEnvironment(Environment environment) {
     //it is safe enough to cast as all known environment is derived from ConfigurableEnvironment
     this.environment = (ConfigurableEnvironment) environment;
-  }
-
-  //only for test
-  private static void reset() {
-    NAMESPACE_NAMES.clear();
-    INITIALIZED.set(false);
   }
 
   @Override

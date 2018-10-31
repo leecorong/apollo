@@ -5,10 +5,9 @@ import com.ctrip.framework.apollo.core.dto.ApolloConfig;
 import com.ctrip.framework.apollo.core.dto.ApolloConfigNotification;
 import com.ctrip.framework.apollo.core.utils.ResourceUtils;
 import com.ctrip.framework.apollo.internals.ConfigServiceLocator;
-import com.ctrip.framework.apollo.spring.config.PropertySourcesProcessor;
-import com.ctrip.framework.apollo.spring.property.SpringValueDefinitionProcessor;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Method;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.stream.Collectors;
 import okhttp3.mockwebserver.Dispatcher;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -37,8 +35,6 @@ public class EmbeddedApollo extends ExternalResource {
   private static final Type notificationType = new TypeToken<List<ApolloConfigNotification>>() {
   }.getType();
 
-  private static Method PROPERTY_SOURCES_PROCESSOR_CLEAR;
-  private static Method SPRING_VALUE_DEFINITION_PROCESS_CLEAR;
   private static Method CONFIG_SERVICE_LOCATOR_CLEAR;
   private static ConfigServiceLocator CONFIG_SERVICE_LOCATOR;
 
@@ -51,10 +47,6 @@ public class EmbeddedApollo extends ExternalResource {
   static {
     try {
       System.setProperty("apollo.longPollingInitialDelayInMills", "0");
-      PROPERTY_SOURCES_PROCESSOR_CLEAR = PropertySourcesProcessor.class.getDeclaredMethod("reset");
-      PROPERTY_SOURCES_PROCESSOR_CLEAR.setAccessible(true);
-      SPRING_VALUE_DEFINITION_PROCESS_CLEAR = SpringValueDefinitionProcessor.class.getDeclaredMethod("reset");
-      SPRING_VALUE_DEFINITION_PROCESS_CLEAR.setAccessible(true);
       CONFIG_SERVICE_LOCATOR = ApolloInjector.getInstance(ConfigServiceLocator.class);
       CONFIG_SERVICE_LOCATOR_CLEAR = ConfigServiceLocator.class.getDeclaredMethod("initConfigServices");
       CONFIG_SERVICE_LOCATOR_CLEAR.setAccessible(true);
@@ -105,9 +97,6 @@ public class EmbeddedApollo extends ExternalResource {
 
   private void clear() throws Exception {
     resetOverriddenProperties();
-    // clear Apollo states
-    PROPERTY_SOURCES_PROCESSOR_CLEAR.invoke(null);
-    SPRING_VALUE_DEFINITION_PROCESS_CLEAR.invoke(null);
   }
 
   private void mockConfigServiceUrl(String url) throws Exception {
@@ -119,8 +108,10 @@ public class EmbeddedApollo extends ExternalResource {
   private String loadConfigFor(String namespace) {
     String filename = String.format("mockdata-%s.properties", namespace);
     final Properties prop = ResourceUtils.readConfigFile(filename, new Properties());
-    Map<String, String> configurations = prop.stringPropertyNames().stream().collect(
-        Collectors.toMap(key -> key, prop::getProperty));
+    Map<String, String> configurations = Maps.newHashMap();
+    for (String propertyName : prop.stringPropertyNames()) {
+      configurations.put(propertyName, prop.getProperty(propertyName));
+    }
     ApolloConfig apolloConfig = new ApolloConfig("someAppId", "someCluster", namespace, "someReleaseKey");
 
     Map<String, String> mergedConfigurations = mergeOverriddenProperties(namespace, configurations);
