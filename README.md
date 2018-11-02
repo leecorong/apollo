@@ -24,10 +24,6 @@ Java客户端不依赖任何框架，能够运行于所有Java运行时环境，
 
 本地快速部署请参见[Quick Start](https://github.com/ctripcorp/apollo/wiki/Quick-Start)
 
-公益演示环境（Demo）:
-- [140.143.100.23:8070](http://140.143.100.23:8070/)
-- 账号/密码:apollo/admin
-
 # Screenshots
 ![配置界面](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/apollo-home-screenshot.png)
 
@@ -230,3 +226,8 @@ The project is licensed under the [Apache 2 license](https://github.com/ctripcor
 ![中移物联网](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/zyiot.jpg) 
 ![易车网](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/biauto.png) 
 ![一药网](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/maiyaole.png) 
+![小影](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/xiaoying.png) 
+![彩贝壳](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/caibeike.png) 
+![YEELIGHT](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/yeelight.png) 
+![积目](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/itsgmu.png) 
+![极致医疗](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/acmedcare.png) 

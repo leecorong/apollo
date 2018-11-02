@@ -25,7 +25,7 @@ import java.io.InputStream;
  * It is an alternative base class to FilterInputStream to increase reusability, because FilterInputStream changes the
  * methods being called, such as read(byte[]) to read(byte[], int, int).
  * <p>
- * See the protected methods for ways in which a subclass can easily decorate a stream with custom pre-, post- or error
+ * See the protected methods for ways in which a subclass can easily decorate a stream with letv pre-, post- or error
  * processing functionality.
  *
  * @version $Id: ProxyInputStream.java 1603493 2014-06-18 15:46:07Z ggregory $
@@ -223,7 +223,7 @@ public abstract class ProxyInputStream extends FilterInputStream {
   /**
    * Handle any IOExceptions thrown.
    * <p>
-   * This method provides a point to implement custom exception handling. The default behaviour is to re-throw the
+   * This method provides a point to implement letv exception handling. The default behaviour is to re-throw the
    * exception.
    * 
    * @param e The IOException thrown

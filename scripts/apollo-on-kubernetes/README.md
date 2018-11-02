@@ -141,16 +141,62 @@ Prod <br/>
 
 # FAQ
 
-- 关于修改的 Dockerfile <br/>
-添加 ENV 和 entrypoint.sh, 启动 server 需要的配置, 在 kubernetes yaml 文件中可以通过 configmap 传入、也可以通过 ENV 传入 <br/>
+## 关于修改的 Dockerfile
+添加 ENV 和 entrypoint.sh, 启动 server 需要的配置, 在 kubernetes yaml 文件中可以通过 configmap 传入、也可以通过 ENV 传入
 关于 Dockerfile、entrypoint.sh 具体内容, 你可以查看文件里的内容
 
-- 关于 kubernetes yaml 文件 <br/>
-具体内容请查看 scripts/apollo-on-kubernetes/kubernetes/service-apollo-portal-server.yaml 注释 <br/>
-其他类似
+## 关于 kubernetes yaml 文件
+具体内容请查看 `scripts/apollo-on-kubernetes/kubernetes/service-apollo-portal-server.yaml` 注释 <br/>
+其他类似。
 
-- 关于 eureka.service.url <br/>
-请在 ApolloConfigDB.ServerConfig 表中配置, 使用 meta-server(即 config-server) 的 pod name, config-server 务必使用 statefulset <br/>
-以 apollo-env-dev 为例: <br/>
-('eureka.service.url', 'default', 'http://statefulset-apollo-config-server-dev-0.service-apollo-meta-server-dev:8080/eureka/,http://statefulset-apollo-config-server-dev-1.service-apollo-meta-server-dev:8080/eureka/,http://statefulset-apollo-config-server-dev-2.service-apollo-meta-server-dev:8080/eureka/', 'Eureka服务Url，多个service以英文逗号分隔') <br/>
-你可以精简 config-server pod 的 name, 示例的长名字是为了更好的阅读与理解
+## 关于 eureka.service.url
+使用 meta-server(即 config-server) 的 pod name, config-server 务必使用 statefulset。
+格式为：`http://<config server pod名>.<meta server 服务名>:<meta server端口号>/eureka/`。
+
+以 apollo-env-dev 为例:
+```bash
+('eureka.service.url', 'default', 'http://statefulset-apollo-config-server-dev-0.service-apollo-meta-server-dev:8080/eureka/,http://statefulset-apollo-config-server-dev-1.service-apollo-meta-server-dev:8080/eureka/,http://statefulset-apollo-config-server-dev-2.service-apollo-meta-server-dev:8080/eureka/', 'Eureka服务Url，多个service以英文逗号分隔')
+```
+你可以精简 config-server pod 的 name, 示例的长名字是为了更好的阅读与理解。
+
+### 方式一：通过Spring Boot文件 application-github.properties配置（推荐）
+推荐此方式配置 `eureka.service.url`，因为可以通过ConfigMap的方式传入容器，无需再修改数据库的字段。
+
+Admin Server的配置：
+```yaml
+---
+# configmap for apollo-admin-server-dev
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  namespace: sre
+  name: configmap-apollo-admin-server-dev
+data:
+  application-github.properties: |
+    spring.datasource.url = jdbc:mysql://service-mysql-for-apollo-dev-env-mariadb.sre:3306/DevApolloConfigDB?characterEncoding=utf8
+    spring.datasource.username = root
+    spring.datasource.password = test
+    eureka.service.url = http://statefulset-apollo-config-server-dev-0.service-apollo-meta-server-dev:8080/eureka/,http://statefulset-apollo-config-server-dev-1.service-apollo-meta-server-dev:8080/eureka/,http://statefulset-apollo-config-server-dev-2.service-apollo-meta-server-dev:8080/eureka/
+
+```
+
+Config Server的配置：
+```yaml
+---
+# configmap for apollo-config-server-dev
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  namespace: sre
+  name: configmap-apollo-config-server-dev
+data:
+  application-github.properties: |
+    spring.datasource.url = jdbc:mysql://service-mysql-for-apollo-dev-env-mariadb.sre:3306/DevApolloConfigDB?characterEncoding=utf8
+    spring.datasource.username = root
+    spring.datasource.password = m6bCdQXa00
+    eureka.service.url = http://statefulset-apollo-config-server-dev-0.service-apollo-meta-server-dev:8080/eureka/,http://statefulset-apollo-config-server-dev-1.service-apollo-meta-server-dev:8080/eureka/,http://statefulset-apollo-config-server-dev-2.service-apollo-meta-server-dev:8080/eureka/
+
+```
+
+### 方式二：修改数据表 ApolloConfigDB.ServerConfig
+修改数据库表 ApolloConfigDB.ServerConfig的 eureka.service.url。
