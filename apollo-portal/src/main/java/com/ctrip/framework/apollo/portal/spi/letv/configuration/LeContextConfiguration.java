@@ -1,7 +1,7 @@
 package com.ctrip.framework.apollo.portal.spi.letv.configuration;
 
 import com.ctrip.framework.apollo.portal.spi.letv.filters.UserAccessFilter;
-import org.springframework.boot.context.embedded.FilterRegistrationBean;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;

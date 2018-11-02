@@ -77,7 +77,7 @@ public class SignInController {
         String hideInfo = "zbdhrirkdmgngitmagic" + username;
         Cookie cookie = new Cookie("tk", hideInfo);
         cookie.setPath("/");
-        cookie.setMaxAge(60*10);
+        cookie.setMaxAge(60*10*30); // 30分钟
         response.addCookie(cookie);
     }
 
