@@ -15,13 +15,12 @@ import com.ctrip.framework.apollo.portal.entity.model.NamespaceReleaseModel;
 import com.ctrip.framework.apollo.portal.service.NamespaceBranchService;
 import com.ctrip.framework.apollo.portal.service.ReleaseService;
 import com.ctrip.framework.apollo.portal.spi.UserService;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,15 +32,21 @@ import static com.ctrip.framework.apollo.common.utils.RequestPrecondition.checkM
 @RequestMapping("/openapi/v1/envs/{env}")
 public class ReleaseController {
 
-  @Autowired
-  private ReleaseService releaseService;
-  @Autowired
-  private UserService userService;
-  @Autowired
-  private NamespaceBranchService namespaceBranchService;
+  private final ReleaseService releaseService;
+  private final UserService userService;
+  private final NamespaceBranchService namespaceBranchService;
+
+  public ReleaseController(
+      final ReleaseService releaseService,
+      final UserService userService,
+      final NamespaceBranchService namespaceBranchService) {
+    this.releaseService = releaseService;
+    this.userService = userService;
+    this.namespaceBranchService = namespaceBranchService;
+  }
 
   @PreAuthorize(value = "@consumerPermissionValidator.hasReleaseNamespacePermission(#request, #appId, #namespaceName, #env)")
-  @RequestMapping(value = "/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/releases", method = RequestMethod.POST)
+  @PostMapping(value = "/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/releases")
   public OpenReleaseDTO createRelease(@PathVariable String appId, @PathVariable String env,
                                       @PathVariable String clusterName,
                                       @PathVariable String namespaceName,
@@ -57,7 +62,7 @@ public class ReleaseController {
       throw new BadRequestException("user(releaseBy) not exists");
     }
 
-    NamespaceReleaseModel releaseModel = BeanUtils.transfrom(NamespaceReleaseModel.class, model);
+    NamespaceReleaseModel releaseModel = BeanUtils.transform(NamespaceReleaseModel.class, model);
 
     releaseModel.setAppId(appId);
     releaseModel.setEnv(Env.fromString(env).toString());
@@ -67,7 +72,7 @@ public class ReleaseController {
     return OpenApiBeanUtils.transformFromReleaseDTO(releaseService.publish(releaseModel));
   }
 
-  @RequestMapping(value = "/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/releases/latest", method = RequestMethod.GET)
+  @GetMapping(value = "/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/releases/latest")
   public OpenReleaseDTO loadLatestActiveRelease(@PathVariable String appId, @PathVariable String env,
                                                 @PathVariable String clusterName, @PathVariable
                                                     String namespaceName) {
@@ -81,7 +86,7 @@ public class ReleaseController {
   }
 
     @PreAuthorize(value = "@consumerPermissionValidator.hasReleaseNamespacePermission(#request, #appId, #namespaceName, #env)")
-    @RequestMapping(value = "/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/branches/{branchName}/merge", method = RequestMethod.POST)
+    @PostMapping(value = "/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/branches/{branchName}/merge")
     public OpenReleaseDTO merge(@PathVariable String appId, @PathVariable String env,
                             @PathVariable String clusterName, @PathVariable String namespaceName,
                             @PathVariable String branchName, @RequestParam(value = "deleteBranch", defaultValue = "true") boolean deleteBranch,
@@ -103,8 +108,7 @@ public class ReleaseController {
     }
 
     @PreAuthorize(value = "@consumerPermissionValidator.hasReleaseNamespacePermission(#request, #appId, #namespaceName, #env)")
-    @RequestMapping(value = "/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/branches/{branchName}/releases",
-            method = RequestMethod.POST)
+    @PostMapping(value = "/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/branches/{branchName}/releases")
     public OpenReleaseDTO createGrayRelease(@PathVariable String appId,
                                         @PathVariable String env, @PathVariable String clusterName,
                                         @PathVariable String namespaceName, @PathVariable String branchName,
@@ -119,7 +123,7 @@ public class ReleaseController {
             throw new BadRequestException("user(releaseBy) not exists");
         }
 
-        NamespaceReleaseModel releaseModel = BeanUtils.transfrom(NamespaceReleaseModel.class, model);
+        NamespaceReleaseModel releaseModel = BeanUtils.transform(NamespaceReleaseModel.class, model);
 
         releaseModel.setAppId(appId);
         releaseModel.setEnv(Env.fromString(env).toString());
@@ -130,8 +134,7 @@ public class ReleaseController {
     }
 
     @PreAuthorize(value = "@consumerPermissionValidator.hasReleaseNamespacePermission(#request, #appId, #namespaceName, #env)")
-    @RequestMapping(value = "/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/branches/{branchName}/gray-del-releases",
-            method = RequestMethod.POST)
+    @PostMapping(value = "/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/branches/{branchName}/gray-del-releases")
     public OpenReleaseDTO createGrayDelRelease(@PathVariable String appId,
                                                @PathVariable String env, @PathVariable String clusterName,
                                                @PathVariable String namespaceName, @PathVariable String branchName,
@@ -149,7 +152,7 @@ public class ReleaseController {
             throw new BadRequestException("user(releaseBy) not exists");
         }
 
-        NamespaceGrayDelReleaseModel releaseModel = BeanUtils.transfrom(NamespaceGrayDelReleaseModel.class, model);
+        NamespaceGrayDelReleaseModel releaseModel = BeanUtils.transform(NamespaceGrayDelReleaseModel.class, model);
         releaseModel.setAppId(appId);
         releaseModel.setEnv(env.toUpperCase());
         releaseModel.setClusterName(branchName);

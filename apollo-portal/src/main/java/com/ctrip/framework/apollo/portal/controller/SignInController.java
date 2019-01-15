@@ -23,50 +23,6 @@ public class SignInController {
     @Autowired
     private UserRepository userRepository;
 
-    @RequestMapping(value = "/signin", method = { RequestMethod.POST, RequestMethod.GET })
-    public String login(@RequestParam(value = "error", required = false) String error,
-            @RequestParam(value = "logout", required = false) String logout) {
-        return "login.html";
-    }
-
-    /**
-     * 登录验证，下发tk
-     *
-     * @return
-     */
-    @RequestMapping(value = "/logon", method = { RequestMethod.POST, RequestMethod.GET })
-    public String logon(@RequestParam(value = "username") String username, @RequestParam(value = "password") String password,
-            HttpServletRequest request, HttpServletResponse response) {
-
-        //本地存储，先从本地获取
-        if (userRepository.findByUsername(username) == null) {
-            //去乐盟验证，验证通过则保存用户信息到本地
-            if (LoginUtil.verify(username, password)) {
-                UserPO userPO = new UserPO();
-                userPO.setUsername(username);
-                userPO.setPassword(Md5Encrypt.md5(password));
-                userPO.setEnabled(1);
-                userPO.setEmail(username + "@le.com");
-                userRepository.save(userPO);
-
-                //下发cookie，并跳转
-                produceCookie(username, response);
-                return "redirect:/";
-            } else {
-                return "redirect:/signin";
-            }
-        } else {
-            //从本地存储的信息验证
-            if (Md5Encrypt.md5(password).equals(userRepository.findByUsername(username).getPassword())) {
-                //下发cookie，并跳转
-                produceCookie(username, response);
-                return "redirect:/";
-            } else {
-                return "redirect:/signin";
-            }
-        }
-    }
-
     /**
      * 下发Cookie
      *
@@ -77,8 +33,55 @@ public class SignInController {
         String hideInfo = "zbdhrirkdmgngitmagic" + username;
         Cookie cookie = new Cookie("tk", hideInfo);
         cookie.setPath("/");
-        cookie.setMaxAge(60*10*30); // 30分钟
+        cookie.setMaxAge(60 * 10 * 30); // 30分钟
         response.addCookie(cookie);
     }
+
+    @RequestMapping(value = "/signin", method = {RequestMethod.POST, RequestMethod.GET})
+    public String login(@RequestParam(value = "error", required = false) String error,
+                        @RequestParam(value = "logout", required = false) String logout) {
+        return "login.html";
+    }
+
+    /**
+     * 登录验证，下发tk
+     *
+     * @return
+     */
+    @RequestMapping(value = "/logon", method = {RequestMethod.POST, RequestMethod.GET})
+    public String logon(@RequestParam(value = "username") String username, @RequestParam(value = "password") String password,
+                        HttpServletRequest request, HttpServletResponse response) {
+        if (LoginUtil.verify(username, password)) {
+            UserPO user = userRepository.findByUsername(username);
+            if (null == user) {
+                saveUser(username, password);
+            } else {
+                if (!Md5Encrypt.md5(password).equals(user.getPassword())) {
+                    user.setPassword(Md5Encrypt.md5(password));
+                    deleteUser(user.getId());
+                    saveUser(username, password);
+                }
+            }
+            //下发cookie，并跳转
+            produceCookie(username, response);
+            return "redirect:/";
+        } else {
+            return "redirect:/signin";
+        }
+    }
+
+    private void saveUser(String username, String password) {
+        UserPO userPO = new UserPO();
+        userPO.setUsername(username);
+        userPO.setPassword(Md5Encrypt.md5(password));
+        userPO.setEnabled(1);
+        userPO.setEmail(username + "@le.com");
+        userRepository.save(userPO);
+    }
+
+    private void deleteUser(long userId){
+        userRepository.deleteById(userId);
+    }
+
 
 }

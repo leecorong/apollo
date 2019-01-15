@@ -27,7 +27,7 @@ public class LeUserService implements UserService {
         if (StringUtils.isEmpty(keyword)) {
             userPOS = userRepository.findFirst20ByEnabled(1);
         } else {
-            userPOS = userRepository.findByUsernameLikeAndEnabled(keyword, 1);
+            userPOS = userRepository.findByUsernameLikeAndEnabled("%" + keyword + "%", 1);
         }
         for (UserPO userPO : userPOS) {
             userInfos.add(userPO.toUserInfo());

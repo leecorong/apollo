@@ -25,3 +25,5 @@ target
 
 # git
 *.orig
+
+.vscode/

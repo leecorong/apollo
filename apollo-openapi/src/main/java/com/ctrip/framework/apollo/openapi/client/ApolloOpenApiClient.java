@@ -87,6 +87,17 @@ public class ApolloOpenApiClient {
   }
 
   /**
+   * Get config
+   *
+   * @return the item or null if not exists
+   *
+   * @since 1.2.0
+   */
+  public OpenItemDTO getItem(String appId, String env, String clusterName, String namespaceName, String key) {
+    return itemService.getItem(appId, env, clusterName, namespaceName, key);
+  }
+
+  /**
    * Add config
    * @return the created config
    */

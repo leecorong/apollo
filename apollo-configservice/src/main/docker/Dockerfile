@@ -1,13 +1,16 @@
 # Dockerfile for apollo-configservice
-# Build with:
-# docker build -t apollo-configservice .
-# Run with:
-# docker run -p 8080:8080 -d -v /tmp/logs:/opt/logs --name apollo-configservice apollo-configservice
+# 1. Copy apollo-configservice-${VERSION}-github.zip to current directory
+# 2. Build with: docker build -t apollo-configservice .
+# 3. Run with: docker run -p 8080:8080 -d -v /tmp/logs:/opt/logs --name apollo-configservice apollo-configservice
 
 FROM openjdk:8-jre-alpine
 MAINTAINER ameizi <sxyx2008@163.com>
 
+<<<<<<< HEAD
 ENV VERSION 1.1.2
+=======
+ENV VERSION 1.3.0-SNAPSHOT
+>>>>>>> 5be80080e05ee9ea0ef37e6c13eff8833a521940
 
 RUN echo "http://mirrors.aliyun.com/alpine/v3.8/main" > /etc/apk/repositories \
     && echo "http://mirrors.aliyun.com/alpine/v3.8/community" >> /etc/apk/repositories \
