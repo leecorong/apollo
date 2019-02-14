@@ -110,7 +110,7 @@ public class AppNamespaceService {
 
     appNamespace = appNamespaceRepository.save(appNamespace);
 
-    instanceOfAppNamespaceInAllCluster(appNamespace.getAppId(), appNamespace.getName(), createBy);
+    createNamespaceForAppNamespaceInAllCluster(appNamespace.getAppId(), appNamespace.getName(), createBy);
 
     auditService.audit(AppNamespace.class.getSimpleName(), appNamespace.getId(), Audit.OP.INSERT, createBy);
     return appNamespace;
@@ -127,7 +127,7 @@ public class AppNamespaceService {
     return managedNs;
   }
 
-  private void instanceOfAppNamespaceInAllCluster(String appId, String namespaceName, String createBy) {
+  public void createNamespaceForAppNamespaceInAllCluster(String appId, String namespaceName, String createBy) {
     List<Cluster> clusters = clusterService.findParentClusters(appId);
 
     for (Cluster cluster : clusters) {

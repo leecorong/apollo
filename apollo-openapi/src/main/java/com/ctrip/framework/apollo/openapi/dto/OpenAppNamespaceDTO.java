@@ -10,6 +10,9 @@ public class OpenAppNamespaceDTO extends BaseDTO {
 
     private boolean isPublic;
 
+    // whether to append namespace prefix for public namespace name
+    private boolean appendNamespacePrefix = true;
+
     private String comment;
 
     public String getName() {
@@ -42,6 +45,14 @@ public class OpenAppNamespaceDTO extends BaseDTO {
 
     public void setPublic(boolean aPublic) {
         isPublic = aPublic;
+    }
+
+    public boolean isAppendNamespacePrefix() {
+        return appendNamespacePrefix;
+    }
+
+    public void setAppendNamespacePrefix(boolean appendNamespacePrefix) {
+        this.appendNamespacePrefix = appendNamespacePrefix;
     }
 
     public String getComment() {

@@ -62,6 +62,10 @@ public class AppNamespaceService {
     return appNamespaceRepository.findByAppIdAndName(appId, namespaceName);
   }
 
+  public List<AppNamespace> findByAppId(String appId) {
+    return appNamespaceRepository.findByAppId(appId);
+  }
+
   @Transactional
   public void createDefaultAppNamespace(String appId) {
     if (!isAppNamespaceNameUnique(appId, ConfigConsts.NAMESPACE_APPLICATION)) {

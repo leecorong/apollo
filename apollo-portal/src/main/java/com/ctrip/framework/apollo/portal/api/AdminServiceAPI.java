@@ -105,6 +105,17 @@ public class AdminServiceAPI {
           .post(env, "apps/{appId}/appnamespaces", appNamespace, AppNamespaceDTO.class, appNamespace.getAppId());
     }
 
+    public AppNamespaceDTO createMissingAppNamespace(Env env, AppNamespaceDTO appNamespace) {
+      return restTemplate
+          .post(env, "apps/{appId}/appnamespaces?silentCreation=true", appNamespace, AppNamespaceDTO.class,
+              appNamespace.getAppId());
+    }
+
+    public List<AppNamespaceDTO> getAppNamespaces(String appId, Env env) {
+      AppNamespaceDTO[] appNamespaceDTOs = restTemplate.get(env, "apps/{appId}/appnamespaces", AppNamespaceDTO[].class, appId);
+      return Arrays.asList(appNamespaceDTOs);
+    }
+
     public void deleteNamespace(Env env, String appId, String clusterName, String namespaceName, String operator) {
       restTemplate
           .delete(env, "apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}?operator={operator}", appId,

@@ -1,7 +1,10 @@
 package com.ctrip.framework.apollo.portal.controller;
 
 import com.ctrip.framework.apollo.common.dto.AppNamespaceDTO;
+import com.ctrip.framework.apollo.common.http.MultiResponseEntity;
+import com.ctrip.framework.apollo.common.http.RichResponseEntity;
 import com.ctrip.framework.apollo.common.utils.BeanUtils;
+import com.ctrip.framework.apollo.portal.api.AdminServiceAPI;
 import com.ctrip.framework.apollo.portal.component.PermissionValidator;
 import com.ctrip.framework.apollo.portal.listener.AppNamespaceDeletionEvent;
 import com.google.common.collect.Sets;
@@ -25,6 +28,8 @@ import com.ctrip.framework.apollo.portal.spi.UserInfoHolder;
 import com.ctrip.framework.apollo.portal.util.RoleUtils;
 import com.ctrip.framework.apollo.tracer.Tracer;
 
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +70,8 @@ public class NamespaceController {
   private PortalConfig portalConfig;
   @Autowired
   private PermissionValidator permissionValidator;
+  @Autowired
+  private AdminServiceAPI.NamespaceAPI namespaceAPI;
 
 
   @RequestMapping(value = "/appnamespaces/public", method = RequestMethod.GET)
@@ -221,6 +228,61 @@ public class NamespaceController {
     return namespaceService.getPublicAppNamespaceAllNamespaces(Env.fromString(env), publicNamespaceName, page, size);
 
   }
+
+  @RequestMapping(value = "/apps/{appId}/envs/{env}/clusters/{clusterName}/missing-namespaces", method = RequestMethod.GET)
+  public MultiResponseEntity<String> findMissingNamespaces(@PathVariable String appId, @PathVariable String env, @PathVariable String clusterName) {
+
+    MultiResponseEntity<String> response = MultiResponseEntity.ok();
+
+    Set<String> missingNamespaces = findMissingNamespaceNames(appId, env, clusterName);
+
+    for (String missingNamespace : missingNamespaces) {
+      response.addResponseEntity(RichResponseEntity.ok(missingNamespace));
+    }
+
+    return response;
+  }
+
+  @RequestMapping(value = "/apps/{appId}/envs/{env}/clusters/{clusterName}/missing-namespaces", method = RequestMethod.POST)
+  public ResponseEntity<Void> createMissingNamespaces(@PathVariable String appId, @PathVariable String env, @PathVariable String clusterName) {
+
+    Set<String> missingNamespaces = findMissingNamespaceNames(appId, env, clusterName);
+
+    for (String missingNamespace : missingNamespaces) {
+      namespaceAPI.createMissingAppNamespace(Env.fromString(env), findAppNamespace(appId, missingNamespace));
+    }
+
+    return ResponseEntity.ok().build();
+  }
+
+  private Set<String> findMissingNamespaceNames(String appId, String env, String clusterName) {
+    List<AppNamespaceDTO> configDbAppNamespaces = namespaceAPI.getAppNamespaces(appId, Env.fromString(env));
+    List<NamespaceDTO> configDbNamespaces = namespaceService.findNamespaces(appId, Env.fromString(env), clusterName);
+    List<AppNamespace> portalDbAppNamespaces = appNamespaceService.findByAppId(appId);
+
+    Set<String> configDbAppNamespaceNames = configDbAppNamespaces.stream().map(AppNamespaceDTO::getName)
+            .collect(Collectors.toSet());
+    Set<String> configDbNamespaceNames = configDbNamespaces.stream().map(NamespaceDTO::getNamespaceName)
+        .collect(Collectors.toSet());
+
+    Set<String> portalDbAllAppNamespaceNames = Sets.newHashSet();
+    Set<String> portalDbPrivateAppNamespaceNames = Sets.newHashSet();
+
+    for (AppNamespace appNamespace : portalDbAppNamespaces) {
+      portalDbAllAppNamespaceNames.add(appNamespace.getName());
+      if (!appNamespace.isPublic()) {
+        portalDbPrivateAppNamespaceNames.add(appNamespace.getName());
+      }
+    }
+
+    // AppNamespaces should be the same
+    Set<String> missingAppNamespaceNames = Sets.difference(portalDbAllAppNamespaceNames, configDbAppNamespaceNames);
+    // Private namespaces should all exist
+    Set<String> missingNamespaceNames = Sets.difference(portalDbPrivateAppNamespaceNames, configDbNamespaceNames);
+
+    return Sets.union(missingAppNamespaceNames, missingNamespaceNames);
+  }
+
 
   private void assignNamespaceRoleToOperator(String appId, String namespaceName) {
     //default assign modify、release namespace role to namespace creator

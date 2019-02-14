@@ -1,5 +1,6 @@
-![apollo-logo](apollo-portal/src/main/resources/static/img/logo-detail.png)
-================
+<img src="https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/logo/logo-simple.png" alt="apollo-logo" width="60%">
+
+# Apollo - A reliable configuration management system
 
 [![Build Status](https://travis-ci.org/ctripcorp/apollo.svg?branch=master)](https://travis-ci.org/ctripcorp/apollo)
 [![GitHub release](https://img.shields.io/github/release/ctripcorp/apollo.svg)](https://github.com/ctripcorp/apollo/releases)
@@ -23,6 +24,10 @@ Java客户端不依赖任何框架，能够运行于所有Java运行时环境，
 更多产品介绍参见[Apollo配置中心介绍](https://github.com/ctripcorp/apollo/wiki/Apollo%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83%E4%BB%8B%E7%BB%8D)
 
 本地快速部署请参见[Quick Start](https://github.com/ctripcorp/apollo/wiki/Quick-Start)
+
+演示环境（Demo）:
+- [106.12.25.204:8070](http://106.12.25.204:8070/)
+- 账号/密码:apollo/admin
 
 # Screenshots
 ![配置界面](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/apollo-home-screenshot.png)
@@ -96,7 +101,9 @@ Java客户端不依赖任何框架，能够运行于所有Java运行时环境，
 
 # Presentation
   * [携程开源配置中心Apollo的设计与实现](http://www.itdks.com/dakalive/detail/3420)
-  * [Slides](http://techshow.ctrip.com/wp-content/uploads/2017/08/%E5%BC%80%E6%BA%90%E9%85%8D%E7%BD%AE%E4%B8%AD%E5%BF%83Apollo%E7%9A%84%E8%AE%BE%E8%AE%A1%E4%B8%8E%E5%AE%9E%E7%8E%B0-%E6%90%BA%E7%A8%8B%E5%AE%8B%E9%A1%BA.pdf)
+    * [Slides](https://myslide.cn/slides/10168)
+  * [配置中心，让微服务更『智能』](https://2018.qconshanghai.com/presentation/799)
+    * [Slides](https://myslide.cn/slides/10035)
 
 # Publication
   * [开源配置中心Apollo的设计与实现](http://www.infoq.com/cn/articles/open-source-configuration-center-apollo)
@@ -231,3 +238,15 @@ The project is licensed under the [Apache 2 license](https://github.com/ctripcor
 ![YEELIGHT](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/yeelight.png) 
 ![积目](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/itsgmu.png) 
 ![极致医疗](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/acmedcare.png) 
+![金汇金融](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/jinhui365.png) 
+![久柏易游](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/900etrip.png) 
+![小麦铺](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/24xiaomai.png) 
+![搜款网](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/vvic.png) 
+![米庄理财](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/mizlicai.png) 
+![贝吉塔网络科技](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/bjt.png) 
+![微盟](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/weimob.png) 
+![网易卡搭](https://raw.githubusercontent.com/ctripcorp/apollo/master/doc/images/known-users/kada.png) 
+
+# Awards
+
+<img src="https://raw.githubusercontent.com/ctripcorp/apollo-community/master/images/awards/oschina-2018-award.jpg" width="240px" alt="2018 年度最受欢迎中国开源软件">

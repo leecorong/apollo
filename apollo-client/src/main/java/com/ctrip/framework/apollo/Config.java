@@ -176,6 +176,8 @@ public interface Config {
    *
    * @param listener the config change listener
    * @param interestedKeys the keys interested by the listener
+   *
+   * @since 1.0.0
    */
   public void addChangeListener(ConfigChangeListener listener, Set<String> interestedKeys);
 
@@ -184,6 +186,8 @@ public interface Config {
    *
    * @param listener the specific config change listener to remove
    * @return true if the specific config change listener is found and removed
+   *
+   * @since 1.1.0
    */
   public boolean removeChangeListener(ConfigChangeListener listener);
 
@@ -202,6 +206,8 @@ public interface Config {
    * @param defaultValue the default value when key is not found or any error occurred
    * @param <T>          user-defined type
    * @return the property value
+   *
+   * @since 1.1.0
    */
   public <T> T getProperty(String key, Function<String, T> function, T defaultValue);
 
@@ -209,6 +215,8 @@ public interface Config {
    * Return the config's source type, i.e. where is the config loaded from
    *
    * @return the config's source type
+   *
+   * @since 1.1.0
    */
   public ConfigSourceType getSourceType();
 }

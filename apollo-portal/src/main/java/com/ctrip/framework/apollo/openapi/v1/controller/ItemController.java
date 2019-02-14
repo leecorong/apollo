@@ -33,6 +33,14 @@ public class ItemController {
   @Autowired
   private UserService userService;
 
+  @RequestMapping(value = "/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/items/{key:.+}", method = RequestMethod.GET)
+  public OpenItemDTO getItem(@PathVariable String appId, @PathVariable String env, @PathVariable String clusterName,
+      @PathVariable String namespaceName, @PathVariable String key) {
+
+    ItemDTO itemDTO = itemService.loadItem(Env.fromString(env), appId, clusterName, namespaceName, key);
+
+    return itemDTO == null ? null : OpenApiBeanUtils.transformFromItemDTO(itemDTO);
+  }
 
   @PreAuthorize(value = "@consumerPermissionValidator.hasModifyNamespacePermission(#request, #appId, #namespaceName, #env)")
   @RequestMapping(value = "/apps/{appId}/clusters/{clusterName}/namespaces/{namespaceName}/items", method = RequestMethod.POST)
