@@ -29,6 +29,7 @@ ENV PROD_META_SERVICE_NAME="service-apollo-config-server-prod.sre"
 
 EXPOSE 8070
 
-ENTRYPOINT ["/apollo-portal-server/entrypoint.sh"]
+# k8s 部署注释掉，否则会提示ReadOnly File System无法正常启动容器
+#ENTRYPOINT ["/apollo-portal-server/entrypoint.sh"]
 
 CMD ["/apollo-portal-server/scripts/startup-kubernetes.sh"]

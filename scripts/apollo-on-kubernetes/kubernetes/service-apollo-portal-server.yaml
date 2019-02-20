@@ -1,46 +1,46 @@
 
 ---
-# 为外部 mysql 服务设置 service
-kind: Service
-apiVersion: v1
-metadata:
-  namespace: sre
-  name: service-mysql-for-portal-server
-  labels:
-    app: service-mysql-for-portal-server
-spec:
-  ports:
-    - protocol: TCP
-      port: 3306
-      targetPort: 3306
-  type: ClusterIP
-  sessionAffinity: None
----
-kind: Endpoints
-apiVersion: v1
-metadata:
-  namespace: sre
-  name: service-mysql-for-portal-server
-subsets:
-  - addresses:
-      # 更改为你的 mysql addresses, 例如 1.1.1.1
-      # 其中 1.1.1.1、2.2.2.2、3.3.3.3 为你的 mysql 集群, 例如 MySQL-Galera-WSrep 或 TiDB
-      - ip: your-mysql-addresses
-    ports:
-      - protocol: TCP
-        port: 3306
-  - addresses:
-      # 更改为你的 mysql addresses, 例如 2.2.2.2
-      - ip: your-mysql-addresses
-    ports:
-      - protocol: TCP
-        port: 3306
-  - addresses:
-      # 更改为你的 mysql addresses, 例如 3.3.3.3
-      - ip: your-mysql-addresses
-    ports:
-      - protocol: TCP
-        port: 3306
+ # 为外部 mysql 服务设置 service
+#kind: Service
+#apiVersion: v1
+#metadata:
+#  namespace: sre
+#  name: service-mysql-for-portal-server
+#  labels:
+#    app: service-mysql-for-portal-server
+#spec:
+#  ports:
+#    - protocol: TCP
+#      port: 3306
+#      targetPort: 3306
+#  type: ClusterIP
+#  sessionAffinity: None
+#---
+#kind: Endpoints
+#apiVersion: v1
+#metadata:
+#  namespace: sre
+#  name: service-mysql-for-portal-server
+#subsets:
+#  - addresses:
+#      # 更改为你的 mysql addresses, 例如 1.1.1.1
+#      # 其中 1.1.1.1、2.2.2.2、3.3.3.3 为你的 mysql 集群, 例如 MySQL-Galera-WSrep 或 TiDB
+#      - ip: m3502i.bjgh.db.lecloud.com
+#    ports:
+#      - protocol: TCP
+#        port: 3502
+#  - addresses:
+#      # 更改为你的 mysql addresses, 例如 2.2.2.2
+#      - ip: your-mysql-addresses
+#    ports:
+#      - protocol: TCP
+#        port: 3306
+#  - addresses:
+#      # 更改为你的 mysql addresses, 例如 3.3.3.3
+#      - ip: your-mysql-addresses
+#    ports:
+#      - protocol: TCP
+#        port: 3306
 
 ---
 # configmap for apollo-portal-server
@@ -51,16 +51,16 @@ metadata:
   name: configmap-apollo-portal-server
 data:
   application-github.properties: |
-    spring.datasource.url = jdbc:mysql://service-mysql-for-portal-server.sre:3306/ApolloPortalDB?characterEncoding=utf8
+    spring.datasource.url = jdbc:mysql://m3502i.bjgh.db.lecloud.com:3502/ApolloPortalDB?characterEncoding=utf8
     # mysql username
-    spring.datasource.username = FillInCorrectUser
+    spring.datasource.username = apolloconfig_w
     # mysql password
-    spring.datasource.password = FillInCorrectPassword
+    spring.datasource.password = hVxKhZ/EPR67IPwG
   apollo-env.properties: |
     dev.meta=http://service-apollo-config-server-dev.sre:8080
-    fat.meta=http://service-apollo-config-server-test-alpha.sre:8080
-    uat.meta=http://service-apollo-config-server-test-beta.sre:8080
+    fat.meta=http://service-apollo-config-server-fat.sre:8080
     pro.meta=http://service-apollo-config-server-prod.sre:8080
+  #    uat.meta=http://service-apollo-config-server-test-beta.sre:8080
 
 ---
 kind: Service
@@ -75,7 +75,7 @@ spec:
     - protocol: TCP
       port: 8070
       targetPort: 8070
-      nodePort: 30001
+      nodePort: 31887
   selector:
     app: pod-apollo-portal-server
   type: NodePort
@@ -105,6 +105,7 @@ spec:
     metadata:
       labels:
         app: pod-apollo-portal-server
+#        update: 2019-02-29-15-30
     spec:
       nodeSelector:
         node: "apollo"
@@ -121,24 +122,24 @@ spec:
       
       initContainers:
         # 确保 admin-service 正常提供服务
-        - image: alpine-bash:3.8
+        - image: reg-sre.lecloud.com/middleware/alpine-bash:3.8
           name: check-service-apollo-admin-server-dev
           command: ['bash', '-c', "curl --connect-timeout 2 --max-time 5 --retry 60 --retry-delay 1 --retry-max-time 120 service-apollo-admin-server-dev.sre:8090"]
-        - image: alpine-bash:3.8
-          name: check-service-apollo-admin-server-dev
-          command: ['bash', '-c', "curl --connect-timeout 2 --max-time 5 --retry 60 --retry-delay 1 --retry-max-time 120 service-apollo-admin-server-test-alpha.sre:8090"]
-        - image: alpine-bash:3.8
-          name: check-service-apollo-admin-server-dev
-          command: ['bash', '-c', "curl --connect-timeout 2 --max-time 5 --retry 60 --retry-delay 1 --retry-max-time 120 service-apollo-admin-server-test-beta.sre:8090"]
-        - image: alpine-bash:3.8
-          name: check-service-apollo-admin-server-dev
-          command: ['bash', '-c', "curl --connect-timeout 2 --max-time 5 --retry 60 --retry-delay 1 --retry-max-time 120 service-apollo-admin-server-prod.sre:8090"]    
-      
+        - image: reg-sre.lecloud.com/middleware/alpine-bash:3.8
+          name: check-service-apollo-admin-server-fat
+          command: ['bash', '-c', "curl --connect-timeout 2 --max-time 5 --retry 60 --retry-delay 1 --retry-max-time 120 service-apollo-admin-server-fat.sre:8090"]
+#        - image: alpine-bash:3.8
+#          name: check-service-apollo-admin-server-dev
+#          command: ['bash', '-c', "curl --connect-timeout 2 --max-time 5 --retry 60 --retry-delay 1 --retry-max-time 120 service-apollo-admin-server-test-beta.sre:8090"]
+        - image: reg-sre.lecloud.com/middleware/alpine-bash:3.8
+          name: check-service-apollo-admin-server-prod
+          command: ['bash', '-c', "curl --connect-timeout 2 --max-time 5 --retry 60 --retry-delay 1 --retry-max-time 120 service-apollo-admin-server-prod.sre:8090"]
+
       containers:
-        - image: apollo-portal-server:v1.0.0    # 更改为你的 docker registry 下的 image
+        - image: reg-sre.lecloud.com/middleware/apollo-portal-server:v1.2.0    # 更改为你的 docker registry 下的 image
           securityContext:
             privileged: true
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: container-apollo-portal-server
           ports:
             - protocol: TCP

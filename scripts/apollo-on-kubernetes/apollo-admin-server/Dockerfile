@@ -24,6 +24,7 @@ ENV DATASOURCES_PASSWORD="FillInCorrectPassword"
 
 EXPOSE 8090
 
-ENTRYPOINT ["/apollo-admin-server/entrypoint.sh"]
+# k8s 部署注释掉，否则会提示ReadOnly File System无法正常启动容器
+#ENTRYPOINT ["/apollo-admin-server/entrypoint.sh"]
 
 CMD ["/apollo-admin-server/scripts/startup-kubernetes.sh"]

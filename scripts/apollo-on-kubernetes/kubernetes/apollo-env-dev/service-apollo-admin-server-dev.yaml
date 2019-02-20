@@ -8,9 +8,9 @@ metadata:
   name: configmap-apollo-admin-server-dev
 data:
   application-github.properties: |
-    spring.datasource.url = jdbc:mysql://service-mysql-for-apollo-dev-env.sre:3306/DevApolloConfigDB?characterEncoding=utf8
-    spring.datasource.username = FillInCorrectUser
-    spring.datasource.password = FillInCorrectPassword
+    spring.datasource.url = jdbc:mysql://m3502i.bjgh.db.lecloud.com:3502/ApolloConfigDEV?characterEncoding=utf8
+    spring.datasource.username = apolloconfig_w
+    spring.datasource.password = hVxKhZ/EPR67IPwG
     eureka.service.url = http://statefulset-apollo-config-server-dev-0.service-apollo-meta-server-dev:8080/eureka/,http://statefulset-apollo-config-server-dev-1.service-apollo-meta-server-dev:8080/eureka/,http://statefulset-apollo-config-server-dev-2.service-apollo-meta-server-dev:8080/eureka/
 
 ---
@@ -53,6 +53,7 @@ spec:
     metadata:
       labels:
         app: pod-apollo-admin-server-dev
+        update: 2019-02-20-15
     spec:
       nodeSelector:
         node: "apollo"
@@ -66,15 +67,15 @@ spec:
                 path: application-github.properties
       
       initContainers:
-        - image: alpine-bash:3.8
+        - image: reg-sre.lecloud.com/middleware/alpine-bash:3.8
           name: check-service-apollo-config-server-dev
           command: ['bash', '-c', "curl --connect-timeout 2 --max-time 5 --retry 60 --retry-delay 1 --retry-max-time 120 service-apollo-config-server-dev.sre:8080"]
       
       containers:
-        - image: apollo-admin-server:v1.0.0
+        - image: reg-sre.lecloud.com/middleware/apollo-admin-server:v1.2.0
           securityContext:
             privileged: true
-          imagePullPolicy: IfNotPresent
+          imagePullPolicy: Always
           name: container-apollo-admin-server-dev
           ports:
             - protocol: TCP
